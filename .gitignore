@@ -149,3 +149,5 @@ dmypy.json
 media/
 yatube_api/posts/static/
 static/
+
+api/request.http
