@@ -35,7 +35,6 @@ class Post(models.Model):
         upload_to='posts/', null=True, blank=True)
 
     class Meta:
-        ordering = ('-pub_date',)
         verbose_name = 'Post'
         verbose_name_plural = 'Posts'
 
