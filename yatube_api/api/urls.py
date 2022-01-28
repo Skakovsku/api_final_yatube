@@ -11,7 +11,7 @@ router.register('user', UserViewSet)
 router.register('posts', PostViewSet)
 
 urlpatterns = [
-    path('v1/groups/<int:id>/', GroupViewSet.as_view({'get': 'list'})),
+    path('v1/groups/<int:id>/', GroupViewSet.as_view({'get': 'retrieve'})),
     path('v1/groups/', GroupViewSet.as_view({'get': 'list'})),
     path('v1/', include('djoser.urls')),
     path('v1/', include('djoser.urls.jwt')),

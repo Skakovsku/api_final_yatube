@@ -36,3 +36,8 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def retrieve(self, request, *args, **kwargs):
+        queryset = Group.objects.get(pk=kwargs['id'])
+        serialiser = GroupSerializer(queryset)
+        return Response(serialiser.data)
