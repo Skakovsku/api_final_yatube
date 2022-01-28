@@ -1,17 +1,17 @@
 ###
 
-GET http://127.0.0.1:8000/api/v1/posts/?limit=2&offset=2
+GET http://127.0.0.1:8000/api/v1/groups/1/
 Content-Type: application/json
 
 ### post admin
 
-POST http://127.0.0.1:8000/api/v1/posts/
+POST http://127.0.0.1:8000/api/v1/jwt/create/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ0NTk3OTcxLCJqdGkiOiIzODk1NDI1ODgxNzA0OWMyYWI5ZTM2YzQxNGE3YTc5OCIsInVzZXJfaWQiOjF9.feEcajqrPLBjtRjtgDpXI30BRnpryAqSNN9KIRehj_s
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY0MzM4ODM3MSwianRpIjoiYzAyNzUzNzk1NmQ1NDkzYmJjOWI1YjE0ZDk2NzI1N2EiLCJ1c2VyX2lkIjoxfQ.o6ApRF11yMIrnWyAVWNWn5eP0Vj1EjHkwZCZwx7ioC4
 
-{
-    "text": "Fourth post of admin"
-}
+#{
+#    "text": "Fourth post of admin"
+#}
 
 ### post Evgeniy
 

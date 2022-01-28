@@ -1,10 +1,10 @@
 from django.core.exceptions import PermissionDenied
 
-from posts.models import Post, User
+from posts.models import Post, User, Group
 from rest_framework import permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-
-from .serializers import PostSerializer, UserSerializer
+from rest_framework.response import Response
+from .serializers import PostSerializer, UserSerializer, GroupSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -30,3 +30,9 @@ class PostViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
