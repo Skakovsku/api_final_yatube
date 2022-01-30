@@ -21,7 +21,7 @@ class Post(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='posts',
+        related_name='posts_author',
         verbose_name='connection',
     )
     group = models.ForeignKey(
@@ -44,9 +44,9 @@ class Post(models.Model):
 
 class Comment(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
+        User, on_delete=models.CASCADE, related_name='comments_user')
     post = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name='comments')
+        Post, on_delete=models.CASCADE, related_name='comments_post')
     text = models.TextField('text_comment')
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
@@ -65,7 +65,7 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='follower',
     )
-    author = models.ForeignKey(
+    following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following',
@@ -75,11 +75,14 @@ class Follow(models.Model):
         verbose_name = 'Follow'
 
     def create_follow(self):
-        follow_obj = Follow.objects.filter(user=self.user, author=self.author)
-        if self.user == self.author:
+        follow_obj = Follow.objects.filter(
+            user=self.user,
+            following=self.following
+        )
+        if self.user == self.following:
             raise ValueError('Нельзя подписаться на самого себя')
         elif follow_obj is True:
             raise ValueError('Вы уже подписаны на этого автора')
 
     def __str__(self):
-        return f'Подписка {self.user} на {self.author}'
+        return f'Подписка {self.user} на {self.following}'
