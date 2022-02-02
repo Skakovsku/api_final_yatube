@@ -1,4 +1,4 @@
-from posts.models import Comment, Follow, Group, Post
+from posts.models import Comment, Follow, Group, Post, User
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -35,13 +35,19 @@ class GroupSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         read_only=True,
+        required=False,
         slug_field='username'
     )
     following = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username'
+        queryset=User.objects.all(),
+        slug_field="username"
     )
 
     class Meta:
         model = Follow
         fields = ('user', 'following', 'id')
+
+    def create(self, validated_data):
+        #data = User.objects.get(user=self.data['following'])
+        print('validated_data=', validated_data, self.data)
+        return validated_data

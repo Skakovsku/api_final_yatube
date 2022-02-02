@@ -21,6 +21,7 @@ class Post(models.Model):
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
+        null=True,
         related_name='posts_author',
         verbose_name='connection',
     )
@@ -72,17 +73,7 @@ class Follow(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Follow'
-
-    def create_follow(self):
-        follow_obj = Follow.objects.filter(
-            user=self.user,
-            following=self.following
-        )
-        if self.user == self.following:
-            raise ValueError('Нельзя подписаться на самого себя')
-        elif follow_obj is True:
-            raise ValueError('Вы уже подписаны на этого автора')
+        verbose_name = 'follow'
 
     def __str__(self):
         return f'Подписка {self.user} на {self.following}'
