@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'djoser',
     'api',
     'posts',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -101,3 +102,5 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+EMPTY_FIELD = '-пусто-'

@@ -35,8 +35,7 @@ class GroupSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         read_only=True,
-        required=False,
-        slug_field='username'
+        slug_field='username',
     )
     following = serializers.SlugRelatedField(
         queryset=User.objects.all(),
@@ -45,9 +44,4 @@ class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ('user', 'following', 'id')
-
-    def create(self, validated_data):
-        #data = User.objects.get(user=self.data['following'])
-        print('validated_data=', validated_data, self.data)
-        return validated_data
+        fields = ('user', 'following')

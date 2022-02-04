@@ -74,6 +74,7 @@ class TestFollowAPI:
         )
 
         data = {'following': another_user.username}
+        print('data', data)
         response = user_client.post('/api/v1/follow/', data=data)
         assert response.status_code == 201, (
             'Проверьте, что при POST запросе на `/api/v1/follow/` с правильными данными возвращается статус 201'
@@ -92,6 +93,7 @@ class TestFollowAPI:
             'Проверьте, что при POST запросе на `/api/v1/follow/` создается подписка'
         )
 
+        print('data', data)
         response = user_client.post('/api/v1/follow/', data=data)
         assert response.status_code == 400, (
             'Проверьте, что при POST запросе на `/api/v1/follow/` '

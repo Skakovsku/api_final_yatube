@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 
 from posts.models import Comment, Follow, Group, Post
-from rest_framework import permissions, status, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
@@ -90,7 +90,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         super(CommentViewSet, self).perform_update(serializer)
 
     def update(self, request, *args, **kwargs):
-        print(args, kwargs)
         if Post.objects.filter(pk=kwargs['id']).count() == 0:
             error = {"detail": "Страница не найдена."}
             return Response(error, status=status.HTTP_404_NOT_FOUND)
@@ -109,8 +108,28 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class FollowViewSet(viewsets.ModelViewSet):
-    queryset = Follow.objects.all()
     serializer_class = FollowSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['following__username', ]
+
+    def get_queryset(self):
+        new_queryset = Follow.objects.filter(user=self.request.user)
+        return new_queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        queryset = Follow.objects.filter(user=self.request.user)
+        follow_obj = self.request.data.values()
+        user_request = self.request.user.username
+        if str(user_request) in follow_obj:
+            error = {"detail": "Нельзя подписаться на себя."}
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        if 'following' in self.request.data:
+            following = self.request.data['following']
+            for query in queryset:
+                if str(query.following) == following:
+                    error = {"detail": "Вы уже подписаны на этого автора."}
+                    return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        return super(FollowViewSet, self).create(request, *args, **kwargs)
