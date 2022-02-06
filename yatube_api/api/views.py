@@ -1,10 +1,10 @@
 from django.core.exceptions import PermissionDenied
 
-from posts.models import Comment, Follow, Group, Post
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
+from posts.models import Comment, Follow, Group, Post
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
@@ -118,18 +118,3 @@ class FollowViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        queryset = Follow.objects.filter(user=self.request.user)
-        follow_obj = self.request.data.values()
-        user_request = self.request.user.username
-        if str(user_request) in follow_obj:
-            error = {"detail": "Нельзя подписаться на себя."}
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        if 'following' in self.request.data:
-            following = self.request.data['following']
-            for query in queryset:
-                if str(query.following) == following:
-                    error = {"detail": "Вы уже подписаны на этого автора."}
-                    return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        return super(FollowViewSet, self).create(request, *args, **kwargs)

@@ -74,6 +74,12 @@ class Follow(models.Model):
 
     class Meta:
         verbose_name = 'follow'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique_user_following'
+            )
+        ]
 
     def __str__(self):
         return f'Подписка {self.user} на {self.following}'
