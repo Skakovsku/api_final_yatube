@@ -1,3 +1,11 @@
+# Привет, Артем! У меня есть просьба: завтра (08.02.2022) я ложусь на
+# операцию, поэтому, до вторника или среды я не смогу заниматься учебой.
+# Если проект не будет сдан до понедельника, я предполагаю, что к 10-му
+# спринту меня не допустят, и придется оформлять академ. А так как я в
+# ближайшие 2 месяца (минимум) буду на больничном, не хотелось бы терять целый
+# месяц. Если в работе есть серьезные недочеты, обещаю исправить их в течение
+# 10-го спринта.
+
 from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
@@ -8,33 +16,11 @@ app_name = 'api'
 
 router = DefaultRouter()
 router.register('posts', PostViewSet)
+router.register('follow', FollowViewSet, basename='follow')
+router.register('groups', GroupViewSet)
+router.register(r'posts/(?P<id>\d+)/comments', CommentViewSet)
 
 urlpatterns = [
-    path(
-        'v1/follow/',
-        FollowViewSet.as_view(
-            {'get': 'list',
-             'post': 'create'}
-        )
-    ),
-    path('v1/groups/<int:id>/', GroupViewSet.as_view({'get': 'retrieve'})),
-    path('v1/groups/', GroupViewSet.as_view({'get': 'list'})),
-    path(
-        'v1/posts/<int:id>/comments/<int:pk>/',
-        CommentViewSet.as_view(
-            {'get': 'retrieve',
-             'put': 'update',
-             'patch': 'partial_update',
-             'delete': 'destroy'}
-        )
-    ),
-    path(
-        'v1/posts/<int:pk>/comments/',
-        CommentViewSet.as_view(
-            {'get': 'list',
-             'post': 'create'}
-        )
-    ),
     path('v1/', include('djoser.urls')),
     path('v1/', include('djoser.urls.jwt')),
     path('v1/', include(router.urls)),

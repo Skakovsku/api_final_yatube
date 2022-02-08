@@ -1,10 +1,10 @@
-from django.core.exceptions import PermissionDenied
-
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from posts.models import Comment, Follow, Group, Post
+
+from .permissions import GroupPermission, PostCommentPermission
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
@@ -12,49 +12,29 @@ from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (PostCommentPermission,)
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def perform_update(self, serializer):
-        if self.request.user != serializer.instance.author:
-            raise PermissionDenied('Изменение чужого контента запрещено!')
-        super(PostViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, instance):
-        if self.request.user != instance.author:
-            raise PermissionDenied('Удаление чужого контента запрещено!')
-        super(PostViewSet, self).perform_destroy(instance)
-
 
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def retrieve(self, request, *args, **kwargs):
-        if self.queryset.count() != 0:
-            queryset = Group.objects.all()
-            for group_id in queryset:
-                if group_id.id == kwargs['id']:
-                    serialiser = GroupSerializer(group_id)
-                    return Response(serialiser.data)
-        error = {"detail": "Страница не найдена."}
-        return Response(error, status=status.HTTP_404_NOT_FOUND)
+    permission_classes = (GroupPermission,)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (PostCommentPermission,)
 
     def list(self, request, *arg, **kwargs):
-        if Post.objects.filter(pk=kwargs['pk']).count() == 0:
+        if Post.objects.filter(pk=kwargs['id']).count() == 0:
             error = {"detail": "Страница не найдена."}
             return Response(error, status=status.HTTP_404_NOT_FOUND)
-        post = Post.objects.get(pk=kwargs['pk'])
+        post = Post.objects.get(pk=kwargs['id'])
         queryset = Comment.objects.filter(post=post)
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -65,40 +45,30 @@ class CommentViewSet(viewsets.ModelViewSet):
             if Comment.objects.filter(post=post).count() != 0:
                 queryset = Comment.objects.filter(post=post)
                 for comment in queryset:
-                    if comment.id == kwargs['pk']:
+                    if str(comment.id) == kwargs['pk']:
                         serialiser = CommentSerializer(comment)
                         return Response(serialiser.data)
         error = {"detail": "Страница не найдена."}
         return Response(error, status=status.HTTP_404_NOT_FOUND)
 
     def perform_create(self, serializer):
-        post = Post.objects.get(pk=self.kwargs['pk'])
+        post = Post.objects.get(pk=self.kwargs['id'])
         serializer.save(
             author=self.request.user,
             post=post
         )
 
     def create(self, request, *args, **kwargs):
-        if Post.objects.filter(pk=kwargs['pk']).count() == 0:
+        if Post.objects.filter(pk=str(kwargs['id'])).count() == 0:
             error = {"detail": "Страница не найдена."}
             return Response(error, status=status.HTTP_404_NOT_FOUND)
         return super(CommentViewSet, self).create(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        if self.request.user != serializer.instance.author:
-            raise PermissionDenied('Изменение чужого контента запрещено!')
-        super(CommentViewSet, self).perform_update(serializer)
 
     def update(self, request, *args, **kwargs):
         if Post.objects.filter(pk=kwargs['id']).count() == 0:
             error = {"detail": "Страница не найдена."}
             return Response(error, status=status.HTTP_404_NOT_FOUND)
         return super(CommentViewSet, self).update(request, *args, **kwargs)
-
-    def perform_destroy(self, instance):
-        if self.request.user != instance.author:
-            raise PermissionDenied('Удаление чужого контента запрещено!')
-        super(CommentViewSet, self).perform_destroy(instance)
 
     def destroy(self, request, *args, **kwargs):
         if Post.objects.filter(pk=kwargs['id']).count() == 0:
@@ -110,7 +80,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ['following__username', ]
+    search_fields = ['=following__username', ]
 
     def get_queryset(self):
         new_queryset = Follow.objects.filter(user=self.request.user)
