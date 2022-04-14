@@ -7,9 +7,6 @@ class GroupPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method not in permissions.SAFE_METHODS:
             raise MethodNotAllowed(request.method)
-        # return request.method in permissions.SAFE_METHODS - этот код
-        # работает, но выбрасывает исключение 403, а тесты требуют - 405.
-        # Поэтому я оставил свой старый код.
         return True
 
 
