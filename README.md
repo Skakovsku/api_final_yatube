@@ -25,6 +25,16 @@ python3 -m venv env
 ```
 source venv/bin/activate
 ```
+Далее необходимо сгенерировать секретный ключ Django. Для этого при активированном виртуальном окружении в терминале введите следующую команду:
+
+```
+(venv) $ python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+```
+Создайте в директории yatube/yatube/ (в одной папке с файлом settings.py) файл с именем .env со следующим содержимым:
+```
+SECRET_KEY=сгенерированный_ключ
+```
+Информацию следует печатать без кавычек, скобок и пробелов.
 
 Установить зависимости из файла requirements.txt:
 
